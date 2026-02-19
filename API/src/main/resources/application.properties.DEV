@@ -1,0 +1,44 @@
+# This is the application.properties file for the Example API.
+# This file should be used for development & testing.
+# This file contains variables which should be set in the environment file instead.
+# To set variables in your environment file, use the following line in your .env file:
+# export VARIABLE_NAME=VARIABLE_VALUE
+
+spring.application.name=example
+server.port=${API_PORT:8080}
+
+# Database configuration
+spring.datasource.url=${DB_URL:jdbc:h2:mem:example;DB_CLOSE_DELAY=-1}
+spring.datasource.username=${DB_USERNAME:sa}
+spring.datasource.password=${DB_PASSWORD:}
+spring.datasource.driver-class-name=${DB_DRIVER:org.h2.Driver}
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+
+# Logging configuration
+logging.level.org.springframework=WARN
+logging.level.be.pxl.student.example=INFO
+logging.file.name=logs/example.log
+logging.pattern.file=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+logging.file.max-size=16MB
+logging.file.max-history=10000
+
+# Management and health check configuration
+management.endpoint.health.probes.enabled=true
+management.endpoints.web.exposure.include=health
+management.endpoint.health.groups.readiness.include=db
+management.endpoint.health.groups.liveness.include=ping
+
+# Swagger configuration
+springdoc.api-docs.enabled=${SWAGGER_ENABLED:true}
+springdoc.swagger-ui.enabled=${SWAGGER_ENABLED:true}
+springdoc.api-docs.path=/api-docs
+springdoc.swagger-ui.path=/swagger
+# Extra Swagger options to prevent swagger from malfunctioning
+springdoc.swagger-ui.operationsSorter=method
+springdoc.swagger-ui.tagsSorter=alpha
+springdoc.enable-hateoas=false
+springdoc.enable-data-rest=false
+springdoc.show-spring-data-rest=false
+springdoc.use-hal-as-default-json-media-type=false
