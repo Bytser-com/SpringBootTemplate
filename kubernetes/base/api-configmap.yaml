@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-api-config
+data:
+  API_PORT: "8080"
+  SWAGGER_ENABLED: "false"
+  DB_URL: "jdbc:postgresql://example-db-rw:5432/exampledb"
+  DB_RO_URL: "jdbc:postgresql://example-db-ro:5432/exampledb"
+  DB_DRIVER: "org.postgresql.Driver"

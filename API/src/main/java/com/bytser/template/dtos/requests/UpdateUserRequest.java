@@ -2,7 +2,7 @@ package com.bytser.template.dtos.requests;
 
 import jakarta.validation.constraints.Email;
 
-public class UpdateExampleRequest {
+public class UpdateUserRequest {
 
     private final String username;
 
@@ -11,7 +11,7 @@ public class UpdateExampleRequest {
 
     private final String password;
 
-    public UpdateExampleRequest(
+    public UpdateUserRequest(
             String username,
             String email,
             String password

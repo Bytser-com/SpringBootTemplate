@@ -1,4 +1,4 @@
-package be.pxl.student.birdwatching.security;
+package com.bytser.template.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,8 +24,6 @@ public class WebSecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                     // Allow user registration
                     .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                    // !Extra: Allow thirsty endpoint
-                    .requestMatchers("/users/thirsty", "/users/thirsty/**").permitAll() 
                      // Allow health endpoints
                     .requestMatchers("/actuator/health/**", "/health/**").permitAll() 
                     // Allow Swagger / OpenAPI

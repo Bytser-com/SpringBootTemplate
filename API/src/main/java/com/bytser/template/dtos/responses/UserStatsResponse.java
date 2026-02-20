@@ -2,7 +2,7 @@ package com.bytser.template.dtos.responses;
 
 import java.util.List;
 
-public class ExampleStatsResponse {
+public class UserStatsResponse {
     private final int totalObservations;
     private final int uniqueSpecies;
     private final int uniqueFamilies;
@@ -11,7 +11,7 @@ public class ExampleStatsResponse {
     private final SpeciesStatsResponse mostObservedSpecies;
     private final List<SpeciesStatsResponse> mostObservedFamily;
 
-    public ExampleStatsResponse(
+    public UserStatsResponse(
             int totalObservations,
             int uniqueSpecies,
             int uniqueFamilies,

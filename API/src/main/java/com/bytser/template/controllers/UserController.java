@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bytser.template.dtos.requests.CreateExampleRequest;
-import com.bytser.template.dtos.requests.UpdateExampleRequest;
+import com.bytser.template.dtos.requests.CreateUserRequest;
+import com.bytser.template.dtos.requests.UpdateUserRequest;
 import com.bytser.template.dtos.responses.ApiErrorResponse;
-import com.bytser.template.dtos.responses.ExampleStatsResponse;
-import com.bytser.template.services.ExampleService;
+import com.bytser.template.dtos.responses.UserStatsResponse;
+import com.bytser.template.services.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,13 +26,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("example")
-public class ExampleController {
+@RequestMapping("users")
+public class UserController {
 
-    private final ExampleService exampleService;
+    private final UserService userService;
 
-	public ExampleController(ExampleService exampleService) {
-		this.exampleService = exampleService;
+	public UserController(UserService userService) {
+		this.userService = userService;
 	}
 
     @Operation(summary = "Register a user")
@@ -44,9 +44,9 @@ public class ExampleController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createExample(
-            @Valid @RequestBody CreateExampleRequest example) {
-        exampleService.addExample(example);
+    public void createUser(
+            @Valid @RequestBody CreateUserRequest user) {
+        userService.addUser(user);
     }
 
     @Operation(summary = "Update a user")
@@ -60,21 +60,21 @@ public class ExampleController {
     @ResponseStatus(HttpStatus.CREATED)
     public void updateUser(
             @PathVariable UUID userId,
-            @Valid @RequestBody UpdateExampleRequest updateExample
+            @Valid @RequestBody UpdateUserRequest updateUser
     ) {
-        exampleService.updateExample(userId, updateExample);
+        userService.updateUser(userId, updateUser);
     }
 
     @Operation(summary = "User statistics")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Ok - Succes",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExampleStatsResponse.class))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserStatsResponse.class))
         ),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
-    public ExampleStatsResponse getExampleStats() {
-        return exampleService.getExampleStats();
+    public UserStatsResponse getUserStats() {
+        return userService.getUserStats();
     }
 }

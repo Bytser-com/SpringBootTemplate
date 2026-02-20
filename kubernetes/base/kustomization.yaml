@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: example
+
+resources:
+  - namespace.yaml
+  - db-app-secret.yaml
+  - db-cluster.yaml
+  - db-migrations-secret.yaml
+  - db-migrations-configmap.yaml
+  - db-migrate-job.yaml
+  - api-configmap.yaml
+  - api-secret.yaml
+  - api-deployment.yaml
+  - api-service.yaml
+  - api-hpa.yaml
+  - api-pdb.yaml
+
+
+labels:
+  - pairs:
+      app.kubernetes.io/name: example
+      app.kubernetes.io/part-of: example
+
+
+images:
+  - name: example-api
+    newName: registry/example-api
+    newTag: "0.0.1"
+  - name: flyway
+    newName: registry/example-migrations
+    newTag: "0.0.1"

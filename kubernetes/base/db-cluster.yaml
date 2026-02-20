@@ -1,0 +1,43 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: example-db
+  namespace: example
+spec:
+  # 1 primary + 2 replicas
+  instances: 3
+
+  # PostgreSQL version
+  postgresVersion: 18
+
+  storage:
+    size: 10Gi
+    storageClass: longhorn
+
+  # Bootstrap initial DB and create users
+  bootstrap:
+    initdb:
+      database: exampledb
+      owner: example_migrations
+      secret:
+        name: example-db-migrations
+  managed:
+    roles:
+      - name: example_app
+        ensure: present
+        login: true
+        passwordSecret:
+          name: example-db-app
+
+  # Available resources – tune as needed
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  # Spread instances across nodes (anti-affinity)
+  affinity:
+    enablePodAntiAffinity: true

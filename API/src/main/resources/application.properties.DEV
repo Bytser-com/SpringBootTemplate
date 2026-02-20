@@ -8,12 +8,19 @@ spring.application.name=example
 server.port=${API_PORT:8080}
 
 # Database configuration
-spring.datasource.url=${DB_URL:jdbc:h2:mem:example;DB_CLOSE_DELAY=-1}
-spring.datasource.username=${DB_USERNAME:sa}
-spring.datasource.password=${DB_PASSWORD:}
-spring.datasource.driver-class-name=${DB_DRIVER:org.h2.Driver}
+# Primary Database (write, consistent)
+spring.datasource.write.url=${DB_URL:jdbc:h2:mem:example;DB_CLOSE_DELAY=-1}
+spring.datasource.write.username=${DB_USERNAME:sa}
+spring.datasource.write.password=${DB_PASSWORD:}
+spring.datasource.write.driver-class-name=${DB_DRIVER:org.h2.Driver}
+# Replicas (read-only, eventually consistent)
+spring.datasource.read.url=${DB_URL:jdbc:h2:mem:example;DB_CLOSE_DELAY=-1}
+spring.datasource.read.username=${DB_USERNAME:sa}
+spring.datasource.read.password=${DB_PASSWORD:}
+spring.datasource.read.driver-class-name=${DB_DRIVER:org.h2.Driver}
+# JPA & Hibernate configuration
 spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
+spring.jpa.show-sql=true
 
 # Logging configuration
 logging.level.org.springframework=WARN

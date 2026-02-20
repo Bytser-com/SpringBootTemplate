@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: example-db-migrate
+  namespace: example
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: flyway
+          image: flyway
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: FLYWAY_URL
+              value: jdbc:postgresql://example-db-rw:5432/exampledb
+            - name: FLYWAY_USER
+              valueFrom:
+                secretKeyRef:
+                  name: example-db-migrations
+                  key: username
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: example-db-migrations
+                  key: password
+            - name: FLYWAY_SCHEMAS
+              value: app
+            - name: FLYWAY_LOCATIONS
+              value: filesystem:/flyway/sql

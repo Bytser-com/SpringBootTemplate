@@ -5,16 +5,16 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.bytser.template.models.Example;
+import com.bytser.template.models.User;
 
-public interface ExampleRepository extends JpaRepository<Example, UUID> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
 
-    Optional<Example> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-    Optional<Example> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
 }

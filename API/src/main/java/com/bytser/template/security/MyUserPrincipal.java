@@ -1,4 +1,4 @@
-package be.pxl.student.birdwatching.security;
+package com.bytser.template.security;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import be.pxl.student.birdwatching.models.User;
+import com.bytser.template.models.User;
 
 // This class is a simple class that implements UserDetails and wraps our User entity
 // This file is mainly AI generated but I believe that this is out of scope for the assignment

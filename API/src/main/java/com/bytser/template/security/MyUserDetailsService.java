@@ -1,12 +1,12 @@
-package be.pxl.student.birdwatching.security;
+package com.bytser.template.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import be.pxl.student.birdwatching.models.User;
-import be.pxl.student.birdwatching.repositories.UserRepository;
+import com.bytser.template.models.User;
+import com.bytser.template.repositories.UserRepository;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {

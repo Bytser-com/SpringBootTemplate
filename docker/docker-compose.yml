@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: example-db
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: exampledb
+      POSTGRES_USER: example_migrations
+      POSTGRES_PASSWORD: IAmAV3ryStr0ngPa55word
+    volumes:
+      - exampledbdata:/var/lib/postgresql
+      - ./init-dbRole.sql:/docker-entrypoint-initdb.d/01-init-dbRole.sql:ro
+    networks:
+      - example-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U example_migrations -d exampledb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # One-shot container that initializes the schema
+  db-migration:
+    image: registry/example-migrations:0.0.1
+    container_name: example-db-migration
+    restart: "no"
+    depends_on:
+      - db
+    networks:
+      - example-net
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/exampledb
+      FLYWAY_USER: example_migrations
+      FLYWAY_PASSWORD: IAmAV3ryStr0ngPa55word
+      FLYWAY_SCHEMAS: app
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql
+    command: ["migrate"]
+
+  api:
+    container_name: example-api
+    image: registry/example-api:0.0.1
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      API_PORT: 8080
+      SWAGGER_ENABLED: "true"
+      DB_URL: jdbc:postgresql://db:5432/exampledb
+      DB_USERNAME: example_app
+      DB_PASSWORD: IAmAV3ryStr0ngPa55word
+      DB_DRIVER: org.postgresql.Driver
+    depends_on:
+      - db
+      - db-migration
+    networks:
+      - example-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  exampledbdata:
+    name: example-db-data
+
+networks:
+  example-net:
+    name: example-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.10.0/24
+          gateway: 172.30.10.1

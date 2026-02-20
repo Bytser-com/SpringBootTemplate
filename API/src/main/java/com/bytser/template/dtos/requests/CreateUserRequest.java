@@ -3,7 +3,7 @@ package com.bytser.template.dtos.requests;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public class CreateExampleRequest {
+public class CreateUserRequest {
 
     @NotBlank(message = "Gebruikersnaam is verplicht")
     private final String username;
@@ -15,7 +15,7 @@ public class CreateExampleRequest {
     @NotBlank(message = "Wachtwoord is verplicht")
     private final String password;
 
-    public CreateExampleRequest(String username, String email, String password) {
+    public CreateUserRequest(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;

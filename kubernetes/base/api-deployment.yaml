@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: example-api
+  template:
+    metadata:
+      labels:
+        app: example-api
+    spec:
+      # Spread instances across nodes (anti-affinity)
+      topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+            labelSelector:
+              matchLabels:
+                app: example-api
+
+      containers:
+        - name: example-api
+          image: example-api
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          envFrom:
+            - configMapRef:
+                name: example-api-config
+            - secretRef:
+                name: example-api-secret
+
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            # Give the app time to start before checking for liveness
+            periodSeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 32
+            initialDelaySeconds: 16
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            # Route traffic only to the pod when it is ready
+            periodSeconds: 4
+            timeoutSeconds: 2
+            failureThreshold: 2
+            successThreshold: 3
+            initialDelaySeconds: 0
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            # Kill the pod if it is unhealthy
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+            initialDelaySeconds: 0
+
+          # Available resources – tune as needed
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

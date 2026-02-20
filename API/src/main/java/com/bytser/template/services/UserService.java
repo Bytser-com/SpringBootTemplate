@@ -16,114 +16,118 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bytser.template.components.DurationFormatter;
-import com.bytser.template.dtos.requests.CreateExampleRequest;
-import com.bytser.template.dtos.requests.UpdateExampleRequest;
-import com.bytser.template.dtos.responses.ExampleStatsResponse;
+import com.bytser.template.dtos.requests.CreateUserRequest;
+import com.bytser.template.dtos.requests.UpdateUserRequest;
 import com.bytser.template.dtos.responses.SpeciesStatsResponse;
+import com.bytser.template.dtos.responses.UserStatsResponse;
 import com.bytser.template.exceptions.NotFoundException;
-import com.bytser.template.models.Example;
 import com.bytser.template.models.Observation;
-import com.bytser.template.repositories.ExampleRepository;
+import com.bytser.template.models.User;
+import com.bytser.template.repositories.UserRepository;
 
 @Service
-public class ExampleService {
+public class UserService {
     
-    private static final Logger log = LoggerFactory.getLogger(ExampleService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    private final ExampleRepository exampleRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public ExampleService(ExampleRepository exampleRepository, PasswordEncoder passwordEncoder) {
-        this.exampleRepository = exampleRepository;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
     
-    public void addExample(CreateExampleRequest createExample) {
-        if (exampleRepository.existsByUsername(createExample.getUsername())) {
-            throw new NotFoundException("Gebruikersnaam " + createExample.getUsername() + " is al in gebruik");
+    @Transactional(readOnly = false)
+    public void addUser(CreateUserRequest createUserRequest) {
+        if (userRepository.existsByUsername(createUserRequest.getUsername())) {
+            throw new NotFoundException("Gebruikersnaam " + createUserRequest.getUsername() + " is al in gebruik");
         }
 
-        Example example = new Example(
-                createExample.getUsername(),
-                createExample.getEmail(),
-                passwordEncoder.encode(createExample.getPassword())    // Encode/Hash the password 
+        User user = new User(
+                createUserRequest.getUsername(),
+                createUserRequest.getEmail(),
+                passwordEncoder.encode(createUserRequest.getPassword())    // Encode/Hash the password 
         );
 
-        exampleRepository.save(example);
+        userRepository.save(user);
 
-        // !INFO: Log Example creation for debugging and auditing
-        log.info("Example created successfully with id={} and username={}",
-            example.getId(), example.getUsername());
+        // !INFO: Log User creation for debugging and auditing
+        log.info("User created successfully with id={} and username={}",
+            user.getId(), user.getUsername());
     }
 
-    public void updateExample(UUID exampleId, UpdateExampleRequest updateExample) {
+    @Transactional(readOnly = false)
+    public void updateUser(UUID userId, UpdateUserRequest updateUser) {
         // At least one field must be provided
-        if ((updateExample.getUsername() == null || updateExample.getUsername().isBlank()) &&
-            (updateExample.getEmail() == null || updateExample.getEmail().isBlank()) &&
-            (updateExample.getPassword() == null || updateExample.getPassword().isBlank())) {
+        if ((updateUser.getUsername() == null || updateUser.getUsername().isBlank()) &&
+            (updateUser.getEmail() == null || updateUser.getEmail().isBlank()) &&
+            (updateUser.getPassword() == null || updateUser.getPassword().isBlank())) {
             throw new NotFoundException("Ongeldige of ontbrekende input data");
         }
 
-        Example example = exampleRepository.findById(exampleId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new NotFoundException("Gebruiker met id " + exampleId + " niet gevonden"));
+                        new NotFoundException("Gebruiker met id " + userId + " niet gevonden"));
 
         // Update username if present
-        if (updateExample.getUsername() != null && !updateExample.getUsername().isBlank()) {
-            example.setUsername(updateExample.getUsername());
+        if (updateUser.getUsername() != null && !updateUser.getUsername().isBlank()) {
+            user.setUsername(updateUser.getUsername());
         }
 
         // Update email if present
-        if (updateExample.getEmail() != null && !updateExample.getEmail().isBlank()) {
-            example.setEmail(updateExample.getEmail());
+        if (updateUser.getEmail() != null && !updateUser.getEmail().isBlank()) {
+            user.setEmail(updateUser.getEmail());
         }
 
         // Update password if present
-        if (updateExample.getPassword() != null && !updateExample.getPassword().isBlank()) {
-            example.setPassword(passwordEncoder.encode(updateExample.getPassword()));     // Encode/Hash the password 
+        if (updateUser.getPassword() != null && !updateUser.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(updateUser.getPassword()));     // Encode/Hash the password 
         }
 
-        exampleRepository.save(example);
+        userRepository.save(user);
 
-        // !INFO: Log Example updates for debugging and auditing
-        log.info("Example updated successfully with id={} and (new)username={}",
-            example.getId(), example.getUsername());
+        // !INFO: Log User updates for debugging and auditing
+        log.info("User updated successfully with id={} and (new)username={}",
+            user.getId(), user.getUsername());
     }
 
-    public ExampleStatsResponse getExampleStats() {
-        Example currentExample = getCurrentExample();
+    @Transactional(readOnly = true)
+    public UserStatsResponse getUserStats() {
+        User currentUser = getCurrentUser();
 
-        // All observations of this Example
-        List<Observation> ExampleObservations = currentExample.getObservations();
+        // All observations of this User
+        List<Observation> userObservations = currentUser.getObservations();
 
-        int ExampleTotalObservations = ExampleObservations.size();
+        int userTotalObservations = userObservations.size();
 
-        // Count Unique species & families of Example
-        int uniqueSpecies = (int) ExampleObservations.stream()
+        // Count Unique species & families of User
+        int uniqueSpecies = (int) userObservations.stream()
                 .map(Observation::getSpeciesCode)
                 .distinct()
                 .count();
 
-        int uniqueFamilies = (int) ExampleObservations.stream()
+        int uniqueFamilies = (int) userObservations.stream()
                 .map(Observation::getFamilyCode)
                 .distinct()
                 .count();
 
         // Calculate average time between observations
-        String avgTimeBetweenObservations = calculateAvgTimeBetweenObservations(ExampleObservations);
+        String avgTimeBetweenObservations = calculateAvgTimeBetweenObservations(userObservations);
 
         // SHow info about the most observed species and family
         SpeciesStatsResponse mostObservedSpecies =
-                calculateMostObservedSpecies(ExampleObservations);
+                calculateMostObservedSpecies(userObservations);
 
         List<SpeciesStatsResponse> mostObservedFamily =
-                calculateMostObservedFamily(ExampleObservations);
+                calculateMostObservedFamily(userObservations);
 
         // Return a completed response DTO
-        return new ExampleStatsResponse(
-                ExampleTotalObservations,
+        return new UserStatsResponse(
+                userTotalObservations,
                 uniqueSpecies,
                 uniqueFamilies,
                 avgTimeBetweenObservations,
@@ -136,14 +140,14 @@ public class ExampleService {
     // Helper functions
     //
 
-    public Example getCurrentExample() {
+    public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String Examplename = authentication.getName();
+        String username = authentication.getName();
 
-        Example currentExample = exampleRepository.findByUsername(Examplename)
+        User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Ingelogde gebruiker niet gevonden"));
 
-        return currentExample;
+        return currentUser;
     }
 
     private String calculateAvgTimeBetweenObservations(List<Observation> observations) {

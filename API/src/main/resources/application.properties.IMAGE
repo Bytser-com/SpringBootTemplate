@@ -6,13 +6,22 @@ spring.application.name=example
 server.port=${API_PORT:8080}
 
 # Database configuration
-spring.datasource.url=${DB_URL}
-spring.datasource.username=${DB_USERNAME}
-spring.datasource.password=${DB_PASSWORD}
-spring.datasource.driver-class-name=${DB_DRIVER:org.postgresql.Driver}
+# Primary Database (write, consistent)
+spring.datasource.write.url=${DB_URL}
+spring.datasource.write.username=${DB_USERNAME}
+spring.datasource.write.password=${DB_PASSWORD}
+spring.datasource.write.driver-class-name=${DB_DRIVER:org.postgresql.Driver}
+# Replicas (read-only, eventually consistent)
+spring.datasource.read.url=${DB_RO_URL}
+spring.datasource.read.username=${DB_USERNAME}
+spring.datasource.read.password=${DB_PASSWORD}
+spring.datasource.read.driver-class-name=${DB_DRIVER:org.postgresql.Driver}
+# JPA & Hibernate configuration
+spring.sql.init.mode=never
 spring.jpa.hibernate.ddl-auto=validate
 spring.jpa.show-sql=false
-spring.sql.init.mode=never
+spring.jpa.open-in-view=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 # Keep retrying database connection & do not crash on database failure
 spring.datasource.hikari.initializationFailTimeout=0
 spring.datasource.hikari.connectionTimeout=5000
@@ -20,7 +29,6 @@ spring.datasource.hikari.validationTimeout=3000
 spring.datasource.hikari.maximumPoolSize=10
 spring.datasource.hikari.minimumIdle=0
 spring.datasource.hikari.keepaliveTime=20000
-spring.jpa.open-in-view=false
 
 # Logging configuration
 logging.level.org.springframework=WARN
@@ -49,6 +57,3 @@ springdoc.enable-hateoas=false
 springdoc.enable-data-rest=false
 springdoc.show-spring-data-rest=false
 springdoc.use-hal-as-default-json-media-type=false
-
-# eBird API configuration
-ebird.api.token=${EBIRD_API_TOKEN:None}

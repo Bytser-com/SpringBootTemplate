@@ -35,13 +35,13 @@ public class Observation {
 
     @ManyToOne(optional=false, fetch = FetchType.LAZY)
     @JoinColumn(name = "example_id")
-    private Example owner;
+    private User owner;
 
     protected Observation() {
         // JPA requirement
     }
 
-    public Observation(String speciesCode, String familyCode, String location, LocalDateTime dateTime, String notes, Example owner) {
+    public Observation(String speciesCode, String familyCode, String location, LocalDateTime dateTime, String notes, User owner) {
         this.speciesCode = speciesCode;
         this.familyCode = familyCode;
         this.location = location;
@@ -89,10 +89,10 @@ public class Observation {
         this.notes = notes;
     }
 
-    public Example getOwner() {
+    public User getOwner() {
         return owner;
     }
-    public void setOwner(Example owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
     }
 

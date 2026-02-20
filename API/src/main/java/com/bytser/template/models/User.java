@@ -17,8 +17,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 
 @Entity
-@Table(name = "examples")
-public class Example {
+@Table(name = "users")
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -38,11 +38,11 @@ public class Example {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Observation> observations = new ArrayList<>();
 
-    protected Example() {
+    protected User() {
         // JPA requirement
     }
 
-    public Example(String username, String email, String password) {
+    public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;

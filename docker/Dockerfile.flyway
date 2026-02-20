@@ -1,0 +1,6 @@
+# docker/Dockerfile.flyway
+FROM flyway/flyway:10.17
+
+# Copy the migrations from your project into the location Flyway expects
+# Adjust the path if your repo layout is different
+COPY API/src/main/resources/db/migrations /flyway/sql
