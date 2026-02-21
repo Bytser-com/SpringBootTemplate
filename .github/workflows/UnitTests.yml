@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - Development
-      - 'features/**/*'
+  pull_request:
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
     inputs:
       debug:
@@ -15,6 +16,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    # When does this job actually run?
+    # - Always for manual workflow_dispatch
+    # - For push events on Development (already filtered above, this is just explicit)
+    # - For pull_request events when the PR's source branch starts with "features/"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/Development') ||
+      (github.event_name == 'pull_request' && startsWith(github.head_ref, 'features/'))
 
     steps:
       - name: Checkout source
