@@ -1,0 +1,50 @@
+name: Run tests automatically on Development and feature branches
+
+on:
+  push:
+    branches:
+      - Development
+      - 'features/**/*'
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: "Enable debug logging"
+        required: false
+        default: "false"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'  # match your project's Java version
+
+      - name: Run unit tests (Maven)
+        working-directory: ./API
+        run: mvn -B test
+        # If you use Gradle instead, replace with:
+        # run: ./gradlew test
+
+      # Parse JUnit XML and create a rich test report in the Checks tab
+      - name: Publish test report
+        if: always()  # run even if tests fail so you still get a report
+        uses: dorny/test-reporter@v1
+        with:
+          name: JUnit Tests
+          path: API/target/surefire-reports/*.xml  # Maven default JUnit XML location
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: Upload test reports artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: API/target/surefire-reports/
